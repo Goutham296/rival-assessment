@@ -22,7 +22,7 @@ export function CommentSection({ blogId }: { blogId: string }) {
     },
   });
 
-  const comments = data?.data ?? data?.comments ?? [];
+  const comments = data?.data  ?? [];
   const total = data?.total ?? 0;
 
   return (
