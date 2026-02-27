@@ -15,8 +15,8 @@ export function CommentSection({ blogId }: { blogId: string }) {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['comments', blogId] }); setContent(''); },
   });
 
-  const comments = data?.data ?? [];
-  const total = data?.meta?.total ?? 0;
+  const comments = data?.comments ?? [];
+  const total = data?.total ?? 0;
 
   return (
     <section>
