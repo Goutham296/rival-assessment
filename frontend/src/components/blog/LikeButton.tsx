@@ -26,9 +26,17 @@ export function LikeButton({ blogId, initialCount, initialLiked = false }: Props
       setCount(res.likeCount);
       setLiked(res.liked);
     } catch (err: any) {
-      setLiked(wasLiked);
-      setCount((c) => (wasLiked ? c + 1 : c - 1));
-      toast.error(err?.response?.data?.message ?? 'Something went wrong');
+      const status = err?.response?.status;
+      const msg = err?.response?.data?.message ?? '';
+      // Already liked → treat as liked state
+      if (status === 409 || msg === 'Already liked') {
+        setLiked(true);
+      } else {
+        // Rollback
+        setLiked(wasLiked);
+        setCount((c) => (wasLiked ? c + 1 : c - 1));
+        toast.error('Something went wrong');
+      }
     } finally {
       setLoading(false);
     }
