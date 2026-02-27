@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuthStore } from '@/lib/hooks/useAuth';
+import { useAuthStore } from '@/store/auth.store';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -13,61 +13,33 @@ export default function LoginPage() {
   const router = useRouter();
 
   const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await login(email, password);
-      toast.success('Welcome back!');
-      router.push('/dashboard');
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Invalid credentials');
-    } finally {
-      setLoading(false);
-    }
+    e.preventDefault(); setLoading(true);
+    try { await login(email, password); toast.success('Welcome back!'); router.push('/dashboard'); }
+    catch (err: any) { toast.error(err?.response?.data?.message ?? 'Invalid credentials'); }
+    finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="card w-full max-w-sm p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
-        <p className="text-gray-500 text-sm mb-6">Sign in to your account</p>
-
-        <form onSubmit={submit} className="space-y-4">
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--cream)', padding: '24px' }}>
+      <div style={{ width: '100%', maxWidth: '420px', background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '24px', padding: '48px 40px', boxShadow: '0 8px 40px rgba(0,0,0,0.06)', animation: 'fadeUp 0.4s ease' }}>
+        <Link href="/feed" style={{ fontFamily: "'Playfair Display', serif", fontSize: '24px', fontWeight: '700', color: 'var(--ink)', textDecoration: 'none', display: 'block', marginBottom: '32px' }}>Rival<span style={{ color: 'var(--accent)' }}>.</span></Link>
+        <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: '28px', fontWeight: '700', color: 'var(--ink)', marginBottom: '6px' }}>Welcome back</h1>
+        <p style={{ fontSize: '14px', color: 'var(--ink-muted)', marginBottom: '32px' }}>Sign in to continue writing</p>
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="input"
-              required
-              autoFocus
-            />
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: 'var(--ink)', marginBottom: '6px' }}>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} className="input" placeholder="you@example.com" required autoFocus />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="input"
-              required
-            />
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: 'var(--ink)', marginBottom: '6px' }}>Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="input" placeholder="••••••••" required />
           </div>
-          <button type="submit" disabled={loading} className="btn-primary w-full">
+          <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '15px', marginTop: '4px', borderRadius: '12px' }}>
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
         </form>
-
-        <p className="text-sm text-center text-gray-500 mt-4">
-          Don't have an account?{' '}
-          <Link href="/auth/register" className="text-indigo-600 hover:underline">
-            Sign up
-          </Link>
+        <p style={{ fontSize: '13px', textAlign: 'center', color: 'var(--ink-muted)', marginTop: '24px' }}>
+          No account yet? <Link href="/auth/register" style={{ color: 'var(--accent)', fontWeight: '600', textDecoration: 'none' }}>Create one</Link>
         </p>
       </div>
     </div>

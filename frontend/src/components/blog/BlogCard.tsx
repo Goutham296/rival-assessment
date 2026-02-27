@@ -1,82 +1,41 @@
 import Link from 'next/link';
 import type { Blog } from '@/types';
 
-interface Props {
-  blog: Blog;
-  showActions?: boolean;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  onTogglePublish?: () => void;
-}
+interface Props { blog: Blog; showActions?: boolean; onEdit?: () => void; onDelete?: () => void; onTogglePublish?: () => void; }
 
 export function BlogCard({ blog, showActions, onEdit, onDelete, onTogglePublish }: Props) {
-  const date = new Date(blog.createdAt).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-
+  const date = new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   return (
-    <article className="card p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            {blog.isPublished !== undefined && (
-              <span
-                className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                  blog.isPublished
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-500'
-                }`}
-              >
-                {blog.isPublished ? 'Published' : 'Draft'}
-              </span>
-            )}
-            <time className="text-xs text-gray-400">{date}</time>
+    <article style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '16px', padding: '24px', transition: 'all 0.2s ease' }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 8px 30px rgba(0,0,0,0.08)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = 'none'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            {blog.isPublished !== undefined && <span className={blog.isPublished ? 'badge-published' : 'badge-draft'}>{blog.isPublished ? '● Published' : '○ Draft'}</span>}
+            {blog.user && <span style={{ fontSize: '12px', color: 'var(--ink-muted)' }}>{blog.user.name ?? blog.user.email}</span>}
+            <span style={{ fontSize: '12px', color: 'var(--ink-muted)' }}>·</span>
+            <time style={{ fontSize: '12px', color: 'var(--ink-muted)' }}>{date}</time>
           </div>
-
-          <Link href={`/blog/${blog.slug}`}>
-            <h2 className="text-lg font-semibold text-gray-900 hover:text-indigo-600 transition-colors truncate">
-              {blog.title}
-            </h2>
+          <Link href={`/blog/${blog.slug}`} style={{ textDecoration: 'none' }}>
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: '20px', fontWeight: '600', color: 'var(--ink)', marginBottom: '8px', lineHeight: '1.3', transition: 'color 0.15s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--accent)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink)')}>{blog.title}</h2>
           </Link>
-
-          {blog.summary && (
-            <p className="text-gray-500 text-sm mt-1 line-clamp-2">{blog.summary}</p>
-          )}
-
-          {blog.user && (
-            <p className="text-xs text-gray-400 mt-2">
-              by {blog.user.name ?? blog.user.email}
-            </p>
-          )}
+          {blog.summary && <p style={{ fontSize: '14px', color: 'var(--ink-light)', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{blog.summary}</p>}
         </div>
-
         {blog._count && (
-          <div className="flex gap-3 text-xs text-gray-400 shrink-0">
-            <span>♥ {blog._count.likes}</span>
-            <span>💬 {blog._count.comments}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }}>
+            <span style={{ fontSize: '13px', color: 'var(--ink-muted)' }}><span style={{ color: '#e8542a' }}>♥</span> {blog._count.likes}</span>
+            <span style={{ fontSize: '13px', color: 'var(--ink-muted)' }}>💬 {blog._count.comments}</span>
           </div>
         )}
       </div>
-
       {showActions && (
-        <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-          <button onClick={onEdit} className="btn-secondary text-xs py-1">
-            Edit
-          </button>
-          <button
-            onClick={onTogglePublish}
-            className="btn-secondary text-xs py-1"
-          >
-            {blog.isPublished ? 'Unpublish' : 'Publish'}
-          </button>
-          <button
-            onClick={onDelete}
-            className="text-xs px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg border border-red-200 transition-colors"
-          >
-            Delete
-          </button>
+        <div style={{ display: 'flex', gap: '8px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+          <button onClick={onEdit} className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px' }}>Edit</button>
+          <button onClick={onTogglePublish} className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px' }}>{blog.isPublished ? 'Unpublish' : 'Publish'}</button>
+          <button onClick={onDelete} className="btn-danger" style={{ padding: '6px 16px', fontSize: '13px' }}>Delete</button>
         </div>
       )}
     </article>

@@ -7,60 +7,45 @@ import { CommentSection } from '@/components/blog/CommentSection';
 import { Navbar } from '@/components/layout/Navbar';
 import Link from 'next/link';
 
-export default function BlogPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default function BlogPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-
-  const { data: blog, isLoading, isError } = useQuery({
-    queryKey: ['blog', slug],
-    queryFn: () => publicApi.getBlogBySlug(slug),
-    retry: false,
-  });
-
-  const date = blog
-    ? new Date(blog.createdAt).toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : '';
+  const { data: blog, isLoading, isError } = useQuery({ queryKey: ['blog', slug], queryFn: () => publicApi.getBlogBySlug(slug), retry: false });
+  const date = blog ? new Date(blog.createdAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '';
 
   return (
     <>
       <Navbar />
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <Link href="/feed" className="text-sm text-indigo-600 hover:underline mb-6 block">
-          ← Back to feed
-        </Link>
-
+      <main style={{ maxWidth: '720px', margin: '0 auto', padding: '40px 24px 80px' }}>
+        <Link href="/feed" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '14px', color: 'var(--ink-muted)', textDecoration: 'none', marginBottom: '40px' }}>← Back to feed</Link>
         {isLoading ? (
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-3/4" />
-            <div className="h-4 bg-gray-100 rounded w-1/3" />
+          <div>
+            <div style={{ height: '48px', background: '#f0f0f5', borderRadius: '8px', width: '70%', marginBottom: '16px' }} />
+            <div style={{ height: '16px', background: '#f5f5f8', borderRadius: '4px', width: '30%', marginBottom: '40px' }} />
           </div>
         ) : isError || !blog ? (
-          <div className="card p-8 text-center">
-            <p className="text-gray-500">Blog not found or not published.</p>
-            <Link href="/feed" className="text-indigo-600 hover:underline mt-4 block">← Back to feed</Link>
+          <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '16px', padding: '64px 32px', textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📄</div>
+            <p style={{ color: 'var(--ink-muted)', marginBottom: '20px' }}>Blog not found or not published yet.</p>
+            <Link href="/feed" className="btn-primary" style={{ display: 'inline-flex' }}>← Back to feed</Link>
           </div>
         ) : (
-          <article>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{blog.title}</h1>
-            <div className="flex items-center gap-3 text-sm text-gray-400 mb-8">
-              <span>{blog.user?.name ?? blog.user?.email}</span>
-              <span>·</span>
-              <time>{date}</time>
-            </div>
-            <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-              {blog.content}
-            </div>
-            <div className="mt-8 pt-6 border-t border-gray-200 flex items-center gap-3">
+          <article className="animate-fade-up">
+            <header style={{ marginBottom: '40px' }}>
+              <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(28px, 5vw, 42px)', fontWeight: '700', color: 'var(--ink)', lineHeight: '1.15', marginBottom: '20px', letterSpacing: '-0.5px' }}>{blog.title}</h1>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingBottom: '24px', borderBottom: '1px solid var(--border)' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px', fontWeight: '600', flexShrink: 0 }}>
+                  {(blog.user?.name ?? blog.user?.email ?? 'A')[0].toUpperCase()}
+                </div>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>{blog.user?.name ?? blog.user?.email}</div>
+                  <time style={{ fontSize: '13px', color: 'var(--ink-muted)' }}>{date}</time>
+                </div>
+              </div>
+            </header>
+            <div style={{ fontSize: '17px', lineHeight: '1.8', color: 'var(--ink-light)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: '48px' }}>{blog.content}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px 0', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', marginBottom: '48px' }}>
               <LikeButton blogId={blog.id} initialCount={blog._count?.likes ?? 0} />
-              <span className="text-sm text-gray-400">{blog._count?.comments ?? 0} comments</span>
+              <span style={{ fontSize: '14px', color: 'var(--ink-muted)' }}>💬 {blog._count?.comments ?? 0} comments</span>
             </div>
             <CommentSection blogId={blog.id} />
           </article>
