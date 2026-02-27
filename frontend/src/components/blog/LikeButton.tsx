@@ -18,18 +18,24 @@ export function LikeButton({ blogId, initialCount, initialLiked = false }: Props
     if (!isAuthenticated) { router.push('/auth/login'); return; }
     if (loading) return;
     const wasLiked = liked;
-    setLiked(!wasLiked); setCount((c) => (wasLiked ? c - 1 : c + 1)); setLoading(true);
+    setLiked(!wasLiked);
+    setCount((c) => (wasLiked ? c - 1 : c + 1));
+    setLoading(true);
     try {
       const res = wasLiked ? await likesApi.unlike(blogId) : await likesApi.like(blogId);
-      setCount(res.likeCount); setLiked(res.liked);
-    } catch { setLiked(wasLiked); setCount((c) => (wasLiked ? c + 1 : c - 1)); toast.error('Something went wrong'); }
-    finally { setLoading(false); }
+      setCount(res.likeCount);
+      setLiked(res.liked);
+    } catch (err: any) {
+      setLiked(wasLiked);
+      setCount((c) => (wasLiked ? c + 1 : c - 1));
+      toast.error(err?.response?.data?.message ?? 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <button onClick={toggle} disabled={loading} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 18px', borderRadius: '999px', fontSize: '14px', fontWeight: '600', cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s ease', border: liked ? '2px solid #e8542a' : '2px solid var(--border)', background: liked ? 'var(--accent-light)' : 'var(--white)', color: liked ? 'var(--accent)' : 'var(--ink-muted)' }}
-      onMouseEnter={e => { if (!liked) { (e.currentTarget as HTMLElement).style.borderColor = '#e8542a'; (e.currentTarget as HTMLElement).style.color = 'var(--accent)'; (e.currentTarget as HTMLElement).style.background = 'var(--accent-light)'; } }}
-      onMouseLeave={e => { if (!liked) { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--ink-muted)'; (e.currentTarget as HTMLElement).style.background = 'var(--white)'; } }}>
+    <button onClick={toggle} disabled={loading} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 18px', borderRadius: '999px', fontSize: '14px', fontWeight: '600', cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s ease', border: liked ? '2px solid #e8542a' : '2px solid var(--border)', background: liked ? 'var(--accent-light)' : 'var(--white)', color: liked ? 'var(--accent)' : 'var(--ink-muted)' }}>
       <span style={{ fontSize: '16px' }}>{liked ? '♥' : '♡'}</span>
       <span>{count}</span>
     </button>
