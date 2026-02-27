@@ -17,6 +17,7 @@ export default function BlogPage({
   const { data: blog, isLoading, isError } = useQuery({
     queryKey: ['blog', slug],
     queryFn: () => publicApi.getBlogBySlug(slug),
+    retry: false,
   });
 
   const date = blog
@@ -40,17 +41,13 @@ export default function BlogPage({
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-gray-200 rounded w-3/4" />
             <div className="h-4 bg-gray-100 rounded w-1/3" />
-            <div className="space-y-2 mt-8">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className="h-4 bg-gray-100 rounded" />
-              ))}
-            </div>
           </div>
-        ) : isError ? (
+        ) : isError || !blog ? (
           <div className="card p-8 text-center">
             <p className="text-gray-500">Blog not found or not published.</p>
+            <Link href="/feed" className="text-indigo-600 hover:underline mt-4 block">← Back to feed</Link>
           </div>
-        ) : blog ? (
+        ) : (
           <article>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">{blog.title}</h1>
             <div className="flex items-center gap-3 text-sm text-gray-400 mb-8">
@@ -58,27 +55,16 @@ export default function BlogPage({
               <span>·</span>
               <time>{date}</time>
             </div>
-
-            <div
-              className="prose prose-gray max-w-none text-gray-700 leading-relaxed"
-              style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-            >
+            <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
               {blog.content}
             </div>
-
             <div className="mt-8 pt-6 border-t border-gray-200 flex items-center gap-3">
-              <LikeButton
-                blogId={blog.id}
-                initialCount={blog._count?.likes ?? 0}
-              />
-              <span className="text-sm text-gray-400">
-                {blog._count?.comments ?? 0} comments
-              </span>
+              <LikeButton blogId={blog.id} initialCount={blog._count?.likes ?? 0} />
+              <span className="text-sm text-gray-400">{blog._count?.comments ?? 0} comments</span>
             </div>
-
             <CommentSection blogId={blog.id} />
           </article>
-        ) : null}
+        )}
       </main>
     </>
   );
