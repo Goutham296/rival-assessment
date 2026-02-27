@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/auth.store';
+import { useAuthStore } from '@/lib/hooks/useAuth';
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuthStore();

@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { commentsApi } from '@/lib/api';
-import { useAuthStore } from '@/store/auth.store';
+import { useAuthStore } from '@/lib/hooks/useAuth';
 
 export function CommentSection({ blogId }: { blogId: string }) {
   const [content, setContent] = useState('');

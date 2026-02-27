@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { likesApi } from '@/lib/api';
-import { useAuthStore } from '@/store/auth.store';
+import { useAuthStore } from '@/lib/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
